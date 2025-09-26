@@ -1,6 +1,7 @@
 [
-  { "week": "Week 1", "winner": "Mike" },
-  { "week": "Week 2", "winner": "Luis" },
+  { "week": "Week 1", "winner": "Luis" },
+  { "week": "Week 2", "winner": "Mike" },
   { "week": "Week 3", "winner": "Luis" }
 ]
+
 
