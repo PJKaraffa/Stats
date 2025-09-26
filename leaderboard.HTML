@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weekly Winners</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { margin-bottom: 10px; }
+    h2 { margin-top: 28px; }
+    table { border-collapse: collapse; width: 520px; margin-bottom: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; vertical-align: top; }
+    th { background: #f0f0f0; }
+    .pill { display:inline-block; padding:.1rem .4rem; border:1px solid #ddd; border-radius:999px; font-size:12px; margin:2px 4px 0 0; }
+  </style>
+</head>
+<body>
+  <h1>Weekly Winners</h1>
+
+  <h2>Leaderboard</h2>
+  <table id="board">
+    <thead>
+      <tr><th>Name</th><th>Wins</th><th>Weeks Won</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>Weeks in Order</h2>
+  <table id="weeks">
+    <thead>
+      <tr><th>Week</th><th>Winner</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function loadData() {
+      // cache-bust so edits show immediately
+      const res = await fetch("data.json?_=" + Date.now());
+      const weeks = await res.json();
+
+      // Aggregate
+      const counts = {};
+      const weeksWon = {};
+      for (const {week, winner} of weeks) {
+        counts[winner] = (counts[winner] || 0) + 1;
+        (weeksWon[winner] ||= []).push(week);
+      }
+
+      // Leaderboard
+      const boardBody = document.querySelector("#board tbody");
+      boardBody.innerHTML = "";
+      Object.keys(counts)
+        .sort((a,b)=> counts[b]-counts[a] || a.localeCompare(b))
+        .forEach(name => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${name}</td>
+            <td>${counts[name]}</td>
+            <td>${weeksWon[name].map(w=>`<span class="pill">${w}</span>`).join(" ")}</td>
+          `;
+          boardBody.appendChild(tr);
+        });
+
+      // Weeks table (chronological)
+      const weeksBody = document.querySelector("#weeks tbody");
+      weeksBody.innerHTML = "";
+      weeks.forEach(({week, winner}) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${week}</td><td>${winner}</td>`;
+        weeksBody.appendChild(tr);
+      });
+    }
+    loadData();
+  </script>
+</body>
+</html>
